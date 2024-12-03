@@ -12,12 +12,12 @@ import (
 )
 
 type Adapter struct {
-	service payment.Service
+	service *payment.Service
 	port    int
 	pb.UnimplementedPaymentServer
 }
 
-func NewAdapter(service payment.Service, port int) *Adapter {
+func NewAdapter(service *payment.Service, port int) *Adapter {
 	return &Adapter{
 		service: service,
 		port:    port,

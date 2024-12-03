@@ -7,11 +7,11 @@ import (
 
 // we use Application to do dependency injection
 type Application struct {
-	order   order.Adapter
-	payment payment.Adapter
+	order   *order.Adapter
+	payment *payment.Adapter
 }
 
-func NewApplication(orderAdapter order.Adapter, paymentAdapter payment.Adapter) *Application {
+func NewApplication(orderAdapter *order.Adapter, paymentAdapter *payment.Adapter) *Application {
 	return &Application{
 		order:   orderAdapter,
 		payment: paymentAdapter,
