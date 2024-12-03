@@ -7,7 +7,7 @@ import (
 	pb "trade-microservice.fyerfyer.net/proto/order"
 )
 
-func (a *Adapter) CreateOrder(ctx context.Context, req *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
+func (a *Adapter) CreateOrder(ctx context.Context, req *pb.ProcessOrderRequest) (*pb.ProcessOrderResponse, error) {
 	// convert grpc object into domain object
 	var items []domain.OrderItem
 	for _, item := range req.OrderItems {
@@ -18,37 +18,10 @@ func (a *Adapter) CreateOrder(ctx context.Context, req *pb.CreateOrderRequest) (
 		})
 	}
 
-	res, err := a.api.CreateOrder(req.GetCustomerId(), items)
+	err := a.api.ProcessOrder(req.GetCustomerId(), items)
 	if err != nil {
-		return nil, err
+		return &pb.ProcessOrderResponse{Status: "failure"}, err
 	}
 
-	return &pb.CreateOrderResponse{OrderId: res.ID}, nil
-}
-
-func (a *Adapter) GetUnpaidOrders(ctx context.Context, req *pb.GetUnpaidOrdersRequest) (*pb.GetUnpaidOrdersResponse, error) {
-	orders, err := a.api.GetUnpaidOrders(req.GetCustomerId())
-	if err != nil {
-		return nil, err
-	}
-
-	var grpcOrders []*pb.OrderEntity
-	for _, order := range orders {
-		var items []*pb.OrderItem
-		for _, item := range order.Items {
-			items = append(items, &pb.OrderItem{
-				ProductCode: item.ProductCode,
-				UnitPrice:   item.UnitPrice,
-				Quantity:    item.Quantity,
-			})
-		}
-
-		grpcOrders = append(grpcOrders, &pb.OrderEntity{
-			OrderId: order.ID,
-			Items:   items,
-			Status:  order.Status,
-		})
-	}
-
-	return &pb.GetUnpaidOrdersResponse{UnpaidOrders: grpcOrders}, nil
+	return &pb.ProcessOrderResponse{Status: "success"}, nil
 }

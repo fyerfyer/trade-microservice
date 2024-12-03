@@ -20,21 +20,23 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	Customer_CreateCustomer_FullMethodName     = "/customer.Customer/CreateCustomer"
+	Customer_GetCustomer_FullMethodName        = "/customer.Customer/GetCustomer"
 	Customer_SubmitOrder_FullMethodName        = "/customer.Customer/SubmitOrder"
 	Customer_GetUnpaidOrders_FullMethodName    = "/customer.Customer/GetUnpaidOrders"
 	Customer_DeactivateCustomer_FullMethodName = "/customer.Customer/DeactivateCustomer"
-	Customer_ActivateUser_FullMethodName       = "/customer.Customer/ActivateUser"
+	Customer_ActivateCustomer_FullMethodName   = "/customer.Customer/ActivateCustomer"
 )
 
 // CustomerClient is the client API for Customer service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CustomerClient interface {
-	CreateCustomer(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
+	CreateCustomer(ctx context.Context, in *CreateCustomerRequest, opts ...grpc.CallOption) (*CreateCustomerResponse, error)
+	GetCustomer(ctx context.Context, in *GetCustomerRequest, opts ...grpc.CallOption) (*GetCustomerResponse, error)
 	SubmitOrder(ctx context.Context, in *SubmitOrderRequest, opts ...grpc.CallOption) (*SubmitOrderResponse, error)
 	GetUnpaidOrders(ctx context.Context, in *GetUnpaidOrdersRequest, opts ...grpc.CallOption) (*GetUnpaidOrdersResponse, error)
-	DeactivateCustomer(ctx context.Context, in *DeactivateUserRequest, opts ...grpc.CallOption) (*DeactivateUserResponse, error)
-	ActivateUser(ctx context.Context, in *ActivateUserRequest, opts ...grpc.CallOption) (*ActivateUserResponse, error)
+	DeactivateCustomer(ctx context.Context, in *DeactivateCustomerRequest, opts ...grpc.CallOption) (*DeactivateCustomerResponse, error)
+	ActivateCustomer(ctx context.Context, in *ActivateCustomerRequest, opts ...grpc.CallOption) (*ActivateCustomerResponse, error)
 }
 
 type customerClient struct {
@@ -45,9 +47,18 @@ func NewCustomerClient(cc grpc.ClientConnInterface) CustomerClient {
 	return &customerClient{cc}
 }
 
-func (c *customerClient) CreateCustomer(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error) {
-	out := new(CreateUserResponse)
+func (c *customerClient) CreateCustomer(ctx context.Context, in *CreateCustomerRequest, opts ...grpc.CallOption) (*CreateCustomerResponse, error) {
+	out := new(CreateCustomerResponse)
 	err := c.cc.Invoke(ctx, Customer_CreateCustomer_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *customerClient) GetCustomer(ctx context.Context, in *GetCustomerRequest, opts ...grpc.CallOption) (*GetCustomerResponse, error) {
+	out := new(GetCustomerResponse)
+	err := c.cc.Invoke(ctx, Customer_GetCustomer_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -72,8 +83,8 @@ func (c *customerClient) GetUnpaidOrders(ctx context.Context, in *GetUnpaidOrder
 	return out, nil
 }
 
-func (c *customerClient) DeactivateCustomer(ctx context.Context, in *DeactivateUserRequest, opts ...grpc.CallOption) (*DeactivateUserResponse, error) {
-	out := new(DeactivateUserResponse)
+func (c *customerClient) DeactivateCustomer(ctx context.Context, in *DeactivateCustomerRequest, opts ...grpc.CallOption) (*DeactivateCustomerResponse, error) {
+	out := new(DeactivateCustomerResponse)
 	err := c.cc.Invoke(ctx, Customer_DeactivateCustomer_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -81,9 +92,9 @@ func (c *customerClient) DeactivateCustomer(ctx context.Context, in *DeactivateU
 	return out, nil
 }
 
-func (c *customerClient) ActivateUser(ctx context.Context, in *ActivateUserRequest, opts ...grpc.CallOption) (*ActivateUserResponse, error) {
-	out := new(ActivateUserResponse)
-	err := c.cc.Invoke(ctx, Customer_ActivateUser_FullMethodName, in, out, opts...)
+func (c *customerClient) ActivateCustomer(ctx context.Context, in *ActivateCustomerRequest, opts ...grpc.CallOption) (*ActivateCustomerResponse, error) {
+	out := new(ActivateCustomerResponse)
+	err := c.cc.Invoke(ctx, Customer_ActivateCustomer_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -94,11 +105,12 @@ func (c *customerClient) ActivateUser(ctx context.Context, in *ActivateUserReque
 // All implementations must embed UnimplementedCustomerServer
 // for forward compatibility
 type CustomerServer interface {
-	CreateCustomer(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
+	CreateCustomer(context.Context, *CreateCustomerRequest) (*CreateCustomerResponse, error)
+	GetCustomer(context.Context, *GetCustomerRequest) (*GetCustomerResponse, error)
 	SubmitOrder(context.Context, *SubmitOrderRequest) (*SubmitOrderResponse, error)
 	GetUnpaidOrders(context.Context, *GetUnpaidOrdersRequest) (*GetUnpaidOrdersResponse, error)
-	DeactivateCustomer(context.Context, *DeactivateUserRequest) (*DeactivateUserResponse, error)
-	ActivateUser(context.Context, *ActivateUserRequest) (*ActivateUserResponse, error)
+	DeactivateCustomer(context.Context, *DeactivateCustomerRequest) (*DeactivateCustomerResponse, error)
+	ActivateCustomer(context.Context, *ActivateCustomerRequest) (*ActivateCustomerResponse, error)
 	mustEmbedUnimplementedCustomerServer()
 }
 
@@ -106,8 +118,11 @@ type CustomerServer interface {
 type UnimplementedCustomerServer struct {
 }
 
-func (UnimplementedCustomerServer) CreateCustomer(context.Context, *CreateUserRequest) (*CreateUserResponse, error) {
+func (UnimplementedCustomerServer) CreateCustomer(context.Context, *CreateCustomerRequest) (*CreateCustomerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateCustomer not implemented")
+}
+func (UnimplementedCustomerServer) GetCustomer(context.Context, *GetCustomerRequest) (*GetCustomerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCustomer not implemented")
 }
 func (UnimplementedCustomerServer) SubmitOrder(context.Context, *SubmitOrderRequest) (*SubmitOrderResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SubmitOrder not implemented")
@@ -115,11 +130,11 @@ func (UnimplementedCustomerServer) SubmitOrder(context.Context, *SubmitOrderRequ
 func (UnimplementedCustomerServer) GetUnpaidOrders(context.Context, *GetUnpaidOrdersRequest) (*GetUnpaidOrdersResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUnpaidOrders not implemented")
 }
-func (UnimplementedCustomerServer) DeactivateCustomer(context.Context, *DeactivateUserRequest) (*DeactivateUserResponse, error) {
+func (UnimplementedCustomerServer) DeactivateCustomer(context.Context, *DeactivateCustomerRequest) (*DeactivateCustomerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeactivateCustomer not implemented")
 }
-func (UnimplementedCustomerServer) ActivateUser(context.Context, *ActivateUserRequest) (*ActivateUserResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ActivateUser not implemented")
+func (UnimplementedCustomerServer) ActivateCustomer(context.Context, *ActivateCustomerRequest) (*ActivateCustomerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ActivateCustomer not implemented")
 }
 func (UnimplementedCustomerServer) mustEmbedUnimplementedCustomerServer() {}
 
@@ -135,7 +150,7 @@ func RegisterCustomerServer(s grpc.ServiceRegistrar, srv CustomerServer) {
 }
 
 func _Customer_CreateCustomer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateUserRequest)
+	in := new(CreateCustomerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -147,7 +162,25 @@ func _Customer_CreateCustomer_Handler(srv interface{}, ctx context.Context, dec 
 		FullMethod: Customer_CreateCustomer_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CustomerServer).CreateCustomer(ctx, req.(*CreateUserRequest))
+		return srv.(CustomerServer).CreateCustomer(ctx, req.(*CreateCustomerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Customer_GetCustomer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCustomerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CustomerServer).GetCustomer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Customer_GetCustomer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CustomerServer).GetCustomer(ctx, req.(*GetCustomerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -189,7 +222,7 @@ func _Customer_GetUnpaidOrders_Handler(srv interface{}, ctx context.Context, dec
 }
 
 func _Customer_DeactivateCustomer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeactivateUserRequest)
+	in := new(DeactivateCustomerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -201,25 +234,25 @@ func _Customer_DeactivateCustomer_Handler(srv interface{}, ctx context.Context, 
 		FullMethod: Customer_DeactivateCustomer_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CustomerServer).DeactivateCustomer(ctx, req.(*DeactivateUserRequest))
+		return srv.(CustomerServer).DeactivateCustomer(ctx, req.(*DeactivateCustomerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Customer_ActivateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ActivateUserRequest)
+func _Customer_ActivateCustomer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ActivateCustomerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CustomerServer).ActivateUser(ctx, in)
+		return srv.(CustomerServer).ActivateCustomer(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Customer_ActivateUser_FullMethodName,
+		FullMethod: Customer_ActivateCustomer_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CustomerServer).ActivateUser(ctx, req.(*ActivateUserRequest))
+		return srv.(CustomerServer).ActivateCustomer(ctx, req.(*ActivateCustomerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -236,6 +269,10 @@ var Customer_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Customer_CreateCustomer_Handler,
 		},
 		{
+			MethodName: "GetCustomer",
+			Handler:    _Customer_GetCustomer_Handler,
+		},
+		{
 			MethodName: "SubmitOrder",
 			Handler:    _Customer_SubmitOrder_Handler,
 		},
@@ -248,8 +285,8 @@ var Customer_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Customer_DeactivateCustomer_Handler,
 		},
 		{
-			MethodName: "ActivateUser",
-			Handler:    _Customer_ActivateUser_Handler,
+			MethodName: "ActivateCustomer",
+			Handler:    _Customer_ActivateCustomer_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

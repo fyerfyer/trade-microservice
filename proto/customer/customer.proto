@@ -5,20 +5,52 @@ package customer;
 option go_package = "proto/customer;customer";
 
 service Customer {
-    rpc CreateCustomer(CreateUserRequest) returns (CreateUserResponse);
+    rpc CreateCustomer(CreateCustomerRequest) returns (CreateCustomerResponse);
+    rpc GetCustomer(GetCustomerRequest) returns (GetCustomerResponse);
     rpc SubmitOrder(SubmitOrderRequest) returns (SubmitOrderResponse);
     rpc GetUnpaidOrders(GetUnpaidOrdersRequest) returns (GetUnpaidOrdersResponse);
-    rpc DeactivateCustomer(DeactivateUserRequest) returns (DeactivateUserResponse);
-    rpc ActivateUser(ActivateUserRequest) returns (ActivateUserResponse);
+    rpc DeactivateCustomer(DeactivateCustomerRequest) returns (DeactivateCustomerResponse);
+    rpc ActivateCustomer(ActivateCustomerRequest) returns (ActivateCustomerResponse);
 }
 
-message CreateUserRequest {
+message CustomerEntity {
+    uint64 customer_id = 1;
+    string name = 2;
+    string status = 3;
+    float balance = 4;
+}
+
+message CreateCustomerRequest {
     string customer_name = 1;
 }
 
-message CreateUserResponse {
+message CreateCustomerResponse {
     uint64 customer_id = 1;
-    string status = 2;
+    bool success = 2;
+}
+
+message GetCustomerRequest {
+    uint64 customer_id = 1;
+}
+
+message GetCustomerResponse {
+    CustomerEntity customer = 1;
+}
+
+message DeactivateCustomerRequest {
+    uint64 customer_id = 1;
+}
+
+message DeactivateCustomerResponse {
+    string status = 1;
+}
+
+message ActivateCustomerRequest {
+    uint64 customer_id = 1;
+}
+
+message ActivateCustomerResponse {
+    string status = 1;
 }
 
 message SubmitOrderRequest {
@@ -37,6 +69,12 @@ message OrderItem {
     int32 quantity = 3;
 }
 
+message Order {
+    uint64 order_id = 1;
+    repeated OrderItem items = 2;
+    string status = 3;
+}
+
 message GetUnpaidOrdersRequest {
     uint64 customer_id = 1;
 }
@@ -45,24 +83,4 @@ message GetUnpaidOrdersResponse {
     repeated Order unpaid_orders = 1;
 }
 
-message Order {
-    uint64 order_id = 1;
-    repeated OrderItem items = 2;
-    string status = 3;
-}
 
-message DeactivateUserRequest {
-    uint64 customer_id = 1;
-}
-
-message DeactivateUserResponse {
-    string status = 1;
-}
-
-message ActivateUserRequest {
-    uint64 customer_id = 1;
-}
-
-message ActivateUserResponse {
-    string status = 1;
-}
