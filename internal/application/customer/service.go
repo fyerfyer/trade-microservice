@@ -85,3 +85,7 @@ func (s *Service) SubmitOrder(customerID uint64, items []domain.OrderItem) (bool
 
 	return true, nil
 }
+
+func (s *Service) GetUnpaidOrders(customerID uint64) ([]domain.Order, error) {
+	return s.repo.GetUnpaidOrdersByID(customerID)
+}

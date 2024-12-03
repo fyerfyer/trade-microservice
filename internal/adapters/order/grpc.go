@@ -18,7 +18,7 @@ func (a *Adapter) CreateOrder(ctx context.Context, req *pb.ProcessOrderRequest) 
 		})
 	}
 
-	err := a.api.ProcessOrder(req.GetCustomerId(), items)
+	err := a.service.ProcessOrder(req.GetCustomerId(), items)
 	if err != nil {
 		return &pb.ProcessOrderResponse{Status: "failure"}, err
 	}

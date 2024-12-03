@@ -7,21 +7,20 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-	"trade-microservice.fyerfyer.net/internal/ports"
+	"trade-microservice.fyerfyer.net/internal/application/payment"
 	pb "trade-microservice.fyerfyer.net/proto/payment"
 )
 
 type Adapter struct {
-	api    ports.PaymentPort
-	port   int
-	server *grpc.Server
+	service payment.Service
+	port    int
 	pb.UnimplementedPaymentServer
 }
 
-func NewAdapter(api ports.PaymentPort, port int) *Adapter {
+func NewAdapter(service payment.Service, port int) *Adapter {
 	return &Adapter{
-		api:  api,
-		port: port,
+		service: service,
+		port:    port,
 	}
 }
 

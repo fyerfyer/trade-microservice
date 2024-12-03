@@ -3,28 +3,26 @@ package customer
 import (
 	"context"
 
-	"google.golang.org/grpc"
+	"trade-microservice.fyerfyer.net/internal/application/customer"
 	"trade-microservice.fyerfyer.net/internal/application/domain"
-	"trade-microservice.fyerfyer.net/internal/ports"
 	pb "trade-microservice.fyerfyer.net/proto/customer"
 )
 
 type Adapter struct {
-	api    ports.CustomerPort
-	port   int
-	server *grpc.Server
+	service customer.Service
+	port    int
 	pb.UnimplementedCustomerServer
 }
 
-func NewAdapter(api ports.CustomerPort, port int) *Adapter {
+func NewAdapter(service customer.Service, port int) *Adapter {
 	return &Adapter{
-		api:  api,
-		port: port,
+		service: service,
+		port:    port,
 	}
 }
 
 func (a *Adapter) CreateCustomer(ctx context.Context, req *pb.CreateCustomerRequest) (*pb.CreateCustomerResponse, error) {
-	customer, err := a.api.CreateCustomer(req.GetCustomerName())
+	customer, err := a.service.CreateCustomer(req.GetCustomerName())
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +34,7 @@ func (a *Adapter) CreateCustomer(ctx context.Context, req *pb.CreateCustomerRequ
 }
 
 func (a *Adapter) GetCustomer(ctx context.Context, req *pb.GetCustomerRequest) (*pb.GetCustomerResponse, error) {
-	customer, err := a.api.GetCustomer(req.GetCustomerId())
+	customer, err := a.service.GetCustomer(req.GetCustomerId())
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +48,7 @@ func (a *Adapter) GetCustomer(ctx context.Context, req *pb.GetCustomerRequest) (
 }
 
 func (a *Adapter) DeactiveCustomer(ctx context.Context, req *pb.DeactivateCustomerRequest) (*pb.DeactivateCustomerResponse, error) {
-	err := a.api.DeactiveCustomer(req.GetCustomerId())
+	err := a.service.DeactiveCustomer(req.GetCustomerId())
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +57,7 @@ func (a *Adapter) DeactiveCustomer(ctx context.Context, req *pb.DeactivateCustom
 }
 
 func (a *Adapter) ActivateCustomer(ctx context.Context, req *pb.ActivateCustomerRequest) (*pb.ActivateCustomerResponse, error) {
-	err := a.api.ReactiveCustomer(req.GetCustomerId())
+	err := a.service.ReactiveCustomer(req.GetCustomerId())
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +66,7 @@ func (a *Adapter) ActivateCustomer(ctx context.Context, req *pb.ActivateCustomer
 }
 
 func (a *Adapter) SubmitOrder(ctx context.Context, req *pb.SubmitOrderRequest) (*pb.SubmitOrderResponse, error) {
-	success, err := a.api.SubmitOrder(req.GetCustomerId(), convertPBIntoDomainItems(req.GetOrderItems()))
+	success, err := a.service.SubmitOrder(req.GetCustomerId(), convertPBIntoDomainItems(req.GetOrderItems()))
 	if err != nil {
 		return &pb.SubmitOrderResponse{
 			Success: success,
@@ -83,7 +81,7 @@ func (a *Adapter) SubmitOrder(ctx context.Context, req *pb.SubmitOrderRequest) (
 }
 
 func (a *Adapter) GetUnpaidOrders(ctx context.Context, req *pb.GetUnpaidOrdersRequest) (*pb.GetUnpaidOrdersResponse, error) {
-	orders, err := a.api.GetUnpaidOrders(req.GetCustomerId())
+	orders, err := a.service.GetUnpaidOrders(req.GetCustomerId())
 	if err != nil {
 		return nil, err
 	}
