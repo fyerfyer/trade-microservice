@@ -3,17 +3,18 @@ package domain
 import "time"
 
 type Order struct {
-	ID         uint64
-	CustomerID uint64
-	Items      []OrderItem
-	Status     string // "unprocessed" or "unpaid"
-	CreatedAt  int64
+	ID         uint64      `json:"id"`
+	CustomerID uint64      `json:"customer_id"`
+	Items      []OrderItem `json:"items"`
+	Status     string      `json:"status"`
+	CreatedAt  time.Time   `json:"created_at"`
 }
 
 type OrderItem struct {
-	ProductCode string
-	UnitPrice   float32
-	Quantity    int32
+	ProductCode string    `json:"product_code"`
+	UnitPrice   float32   `json:"unit_price"`
+	Quantity    int32     `json:"quantity"`
+	CreatedAt   time.Time `json:"created_at"`
 }
 
 func NewOrder(customerID uint64, orderItems []OrderItem) *Order {
@@ -21,7 +22,7 @@ func NewOrder(customerID uint64, orderItems []OrderItem) *Order {
 		CustomerID: customerID,
 		Items:      orderItems,
 		Status:     "unprocessed",
-		CreatedAt:  time.Now().Unix(),
+		CreatedAt:  time.Now(),
 	}
 }
 

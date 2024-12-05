@@ -1,4 +1,4 @@
-package order
+package customer
 
 import (
 	"fmt"
@@ -6,17 +6,18 @@ import (
 	"net"
 
 	"google.golang.org/grpc"
-	"trade-microservice.fyerfyer.net/internal/application/order"
-	pb "trade-microservice.fyerfyer.net/proto/order"
+	"google.golang.org/grpc/reflection"
+	"trade-microservice.fyerfyer.net/internal/application/customer"
+	pb "trade-microservice.fyerfyer.net/proto/customer"
 )
 
 type Adapter struct {
-	service *order.Service
+	service *customer.Service
 	port    int
-	pb.UnimplementedOrderServer
+	pb.UnimplementedCustomerServer
 }
 
-func NewAdapter(service *order.Service, port int) *Adapter {
+func NewAdapter(service *customer.Service, port int) *Adapter {
 	return &Adapter{
 		service: service,
 		port:    port,
@@ -30,7 +31,8 @@ func (a *Adapter) Run() {
 	}
 
 	grpcServer := grpc.NewServer()
-	pb.RegisterOrderServer(grpcServer, a)
+	pb.RegisterCustomerServer(grpcServer, a)
+	reflection.Register(grpcServer)
 	if err := grpcServer.Serve(listen); err != nil {
 		log.Fatalf("failed to serve grpc on port %d:%v", a.port, err)
 	}

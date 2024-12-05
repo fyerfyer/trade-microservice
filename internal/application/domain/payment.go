@@ -1,12 +1,9 @@
 package domain
 
-import "time"
-
 type Payment struct {
-	CustomerID uint64
-	OrderID    uint64
-	TotalPrice float32
-	Status     string // "success" or "failure"
-	Message    string
-	CreatedAt  time.Time
+	CustomerID uint64  `json:"customer_id"`
+	OrderID    uint64  `json:"order_id"`
+	TotalPrice float32 `json:"total_price"`
+	Status     string  `json:"status"`
+	Message    string  `json:"message"`
 }

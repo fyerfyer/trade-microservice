@@ -39,7 +39,18 @@ func (r *GormRepository) Update(customer *domain.Customer) error {
 
 func (r *GormRepository) GetByID(customerID uint64) (*domain.Customer, error) {
 	var customer Customer
-	err := r.db.Where("customer_id = ?", customerID).First(&customer).Error
+	err := r.db.Where("id = ?", customerID).First(&customer).Error
+	if err != nil {
+		return nil, err
+	}
+
+	domainCustomer := ConvertDBIntoDomainCustomer(customer)
+	return &domainCustomer, nil
+}
+
+func (r *GormRepository) GetByName(customerName string) (*domain.Customer, error) {
+	var customer Customer
+	err := r.db.Where("name = ?", customerName).First(&customer).Error
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +61,7 @@ func (r *GormRepository) GetByID(customerID uint64) (*domain.Customer, error) {
 
 func (r *GormRepository) GetUnpaidOrdersByID(customerID uint64) ([]domain.Order, error) {
 	var orders []order.Order
-	err := r.db.Where("customer_id = ?", customerID).Find(&orders).Error
+	err := r.db.Where("id = ?", customerID).Find(&orders).Error
 	if err != nil {
 		return nil, err
 	}
@@ -61,6 +72,10 @@ func (r *GormRepository) GetUnpaidOrdersByID(customerID uint64) ([]domain.Order,
 
 func ConvertDomainCustomerIntoDB(customer domain.Customer) Customer {
 	return Customer{
+		Model: gorm.Model{
+			ID:        uint(customer.ID),
+			CreatedAt: customer.CreatedAt,
+		},
 		Name:    customer.Name,
 		Status:  customer.Status,
 		Balance: customer.Balance,
@@ -69,8 +84,10 @@ func ConvertDomainCustomerIntoDB(customer domain.Customer) Customer {
 
 func ConvertDBIntoDomainCustomer(customer Customer) domain.Customer {
 	return domain.Customer{
-		Name:    customer.Name,
-		Status:  customer.Status,
-		Balance: customer.Balance,
+		ID:        uint64(customer.ID),
+		Name:      customer.Name,
+		Status:    customer.Status,
+		Balance:   customer.Balance,
+		CreatedAt: customer.CreatedAt,
 	}
 }

@@ -6,7 +6,6 @@ import (
 	"net"
 
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 	"trade-microservice.fyerfyer.net/internal/application/payment"
 	pb "trade-microservice.fyerfyer.net/proto/payment"
 )
@@ -32,7 +31,6 @@ func (a *Adapter) Run() {
 
 	grpcServer := grpc.NewServer()
 	pb.RegisterPaymentServer(grpcServer, a)
-	reflection.Register(grpcServer)
 	if err := grpcServer.Serve(listen); err != nil {
 		log.Fatalf("failed to serve grpc on port %d:%v", a.port, err)
 	}

@@ -7,17 +7,16 @@ import (
 
 type Order struct {
 	gorm.Model
-	CustomerID uint64      `gorm:"not null;index"`
-	Status     string      `gorm:"type:varchar(50);not null"`
-	OrderItems []OrderItem `gorm:"foreignKey:OrderID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"` // Cascaded update
+	CustomerID uint64      `gorm:"not null;index" json:"customer_id"`
+	Status     string      `gorm:"type:varchar(50);not null" json:"status"`
+	OrderItems []OrderItem `gorm:"foreignKey:OrderID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"order_items"`
 }
 
 type OrderItem struct {
-	gorm.Model
-	ProductCode string  `gorm:"type:varchar(100);not null"`
-	UnitPrice   float32 `gorm:"not null"`
-	Quantity    int32   `gorm:"not null"`
-	OrderID     uint64  `gorm:"not null;index"` // foreign index
+	ProductCode string  `gorm:"primaryKey;type:varchar(100);not null" json:"product_code"`
+	UnitPrice   float32 `gorm:"not null" json:"unit_price"`
+	Quantity    int32   `gorm:"not null" json:"quantity"`
+	OrderID     uint64  `gorm:"primaryKey;not null;index" json:"order_id"`
 }
 
 type GormRepository struct {
@@ -52,7 +51,7 @@ func (r *GormRepository) Delete(orderID uint64) error {
 
 func (r *GormRepository) FindUnpaidByUser(userID uint64) ([]domain.Order, error) {
 	var orders []Order
-	err := r.db.Where("user_id = ? AND status = ?", userID, "unpaid").
+	err := r.db.Where("customer_id = ? AND status = ?", userID, "unpaid").
 		Find(&orders).
 		Error
 
@@ -75,6 +74,10 @@ func ConvertDomainOrderIntoDB(order domain.Order) Order {
 	}
 
 	return Order{
+		Model: gorm.Model{
+			ID:        uint(order.ID),
+			CreatedAt: order.CreatedAt,
+		},
 		CustomerID: order.CustomerID,
 		Status:     order.Status,
 		OrderItems: orderItems,

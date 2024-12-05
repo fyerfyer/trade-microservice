@@ -7,8 +7,7 @@ import (
 )
 
 type Payment struct {
-	gorm.Model
-	CustomerID uint64  `gorm:"not null;index"`
+	CustomerID uint64  `gorm:"primaryKey;not null;index"`
 	OrderID    uint64  `gorm:"not null;index"`
 	TotalPrice float32 `gorm:"not null"`
 	Status     string  `gorm:"type:varchar(50);not null"`
@@ -24,7 +23,7 @@ func NewGormRepository(db *gorm.DB) *GormRepository {
 
 func (r *GormRepository) GetCustomerByID(customerID uint64) (*domain.Customer, error) {
 	var c customer.Customer
-	if err := r.db.First(&c, customerID).Error; err != nil {
+	if err := r.db.Model(&customer.Customer{}).Where("id = ?", customerID).First(&c, customerID).Error; err != nil {
 		return nil, err
 	}
 
@@ -35,7 +34,7 @@ func (r *GormRepository) GetCustomerByID(customerID uint64) (*domain.Customer, e
 func (r *GormRepository) UpdateCustomerBalance(c *domain.Customer) error {
 	// convert domain object into db object
 	dbCustomer := customer.ConvertDomainCustomerIntoDB(*c)
-	return r.db.Save(&dbCustomer).Error
+	return r.db.Model(&customer.Customer{}).Where("id = ?", c.ID).Save(&dbCustomer).Error
 }
 
 func (r *GormRepository) SavePayment(payment *domain.Payment) error {

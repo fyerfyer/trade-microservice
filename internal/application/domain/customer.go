@@ -1,10 +1,13 @@
 package domain
 
+import "time"
+
 type Customer struct {
-	ID      uint64
-	Name    string
-	Status  string // "active" or "inactive"
-	Balance float32
+	ID        uint64    `json:"id"`
+	Name      string    `json:"name"`
+	Status    string    `json:"status"`
+	Balance   float32   `json:"balance"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 func (c *Customer) CanPlaceOrder() bool {
@@ -17,4 +20,8 @@ func (c *Customer) DeductBalance(amount float32) bool {
 		return true
 	}
 	return false
+}
+
+func (c *Customer) AddBalance(amount float32) {
+	c.Balance += amount
 }

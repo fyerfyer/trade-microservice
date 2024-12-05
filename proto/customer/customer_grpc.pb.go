@@ -25,6 +25,7 @@ const (
 	Customer_GetUnpaidOrders_FullMethodName    = "/customer.Customer/GetUnpaidOrders"
 	Customer_DeactivateCustomer_FullMethodName = "/customer.Customer/DeactivateCustomer"
 	Customer_ActivateCustomer_FullMethodName   = "/customer.Customer/ActivateCustomer"
+	Customer_StoreBalance_FullMethodName       = "/customer.Customer/StoreBalance"
 )
 
 // CustomerClient is the client API for Customer service.
@@ -37,6 +38,7 @@ type CustomerClient interface {
 	GetUnpaidOrders(ctx context.Context, in *GetUnpaidOrdersRequest, opts ...grpc.CallOption) (*GetUnpaidOrdersResponse, error)
 	DeactivateCustomer(ctx context.Context, in *DeactivateCustomerRequest, opts ...grpc.CallOption) (*DeactivateCustomerResponse, error)
 	ActivateCustomer(ctx context.Context, in *ActivateCustomerRequest, opts ...grpc.CallOption) (*ActivateCustomerResponse, error)
+	StoreBalance(ctx context.Context, in *StoreBalanceRequest, opts ...grpc.CallOption) (*StoreBalanceResponse, error)
 }
 
 type customerClient struct {
@@ -101,6 +103,15 @@ func (c *customerClient) ActivateCustomer(ctx context.Context, in *ActivateCusto
 	return out, nil
 }
 
+func (c *customerClient) StoreBalance(ctx context.Context, in *StoreBalanceRequest, opts ...grpc.CallOption) (*StoreBalanceResponse, error) {
+	out := new(StoreBalanceResponse)
+	err := c.cc.Invoke(ctx, Customer_StoreBalance_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CustomerServer is the server API for Customer service.
 // All implementations must embed UnimplementedCustomerServer
 // for forward compatibility
@@ -111,6 +122,7 @@ type CustomerServer interface {
 	GetUnpaidOrders(context.Context, *GetUnpaidOrdersRequest) (*GetUnpaidOrdersResponse, error)
 	DeactivateCustomer(context.Context, *DeactivateCustomerRequest) (*DeactivateCustomerResponse, error)
 	ActivateCustomer(context.Context, *ActivateCustomerRequest) (*ActivateCustomerResponse, error)
+	StoreBalance(context.Context, *StoreBalanceRequest) (*StoreBalanceResponse, error)
 	mustEmbedUnimplementedCustomerServer()
 }
 
@@ -135,6 +147,9 @@ func (UnimplementedCustomerServer) DeactivateCustomer(context.Context, *Deactiva
 }
 func (UnimplementedCustomerServer) ActivateCustomer(context.Context, *ActivateCustomerRequest) (*ActivateCustomerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ActivateCustomer not implemented")
+}
+func (UnimplementedCustomerServer) StoreBalance(context.Context, *StoreBalanceRequest) (*StoreBalanceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StoreBalance not implemented")
 }
 func (UnimplementedCustomerServer) mustEmbedUnimplementedCustomerServer() {}
 
@@ -257,6 +272,24 @@ func _Customer_ActivateCustomer_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Customer_StoreBalance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StoreBalanceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CustomerServer).StoreBalance(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Customer_StoreBalance_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CustomerServer).StoreBalance(ctx, req.(*StoreBalanceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Customer_ServiceDesc is the grpc.ServiceDesc for Customer service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -287,6 +320,10 @@ var Customer_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ActivateCustomer",
 			Handler:    _Customer_ActivateCustomer_Handler,
+		},
+		{
+			MethodName: "StoreBalance",
+			Handler:    _Customer_StoreBalance_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -3,6 +3,7 @@ module trade-microservice.fyerfyer.net
 go 1.23.1
 
 require (
+	github.com/gomodule/redigo v1.9.2
 	google.golang.org/grpc v1.68.0
 	google.golang.org/protobuf v1.35.2
 	gorm.io/driver/mysql v1.5.7

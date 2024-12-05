@@ -3,23 +3,9 @@ package customer
 import (
 	"context"
 
-	"trade-microservice.fyerfyer.net/internal/application/customer"
 	"trade-microservice.fyerfyer.net/internal/application/domain"
 	pb "trade-microservice.fyerfyer.net/proto/customer"
 )
-
-type Adapter struct {
-	service *customer.Service
-	port    int
-	pb.UnimplementedCustomerServer
-}
-
-func NewAdapter(service *customer.Service, port int) *Adapter {
-	return &Adapter{
-		service: service,
-		port:    port,
-	}
-}
 
 func (a *Adapter) CreateCustomer(ctx context.Context, req *pb.CreateCustomerRequest) (*pb.CreateCustomerResponse, error) {
 	customer, err := a.service.CreateCustomer(req.GetCustomerName())
@@ -88,6 +74,18 @@ func (a *Adapter) GetUnpaidOrders(ctx context.Context, req *pb.GetUnpaidOrdersRe
 
 	return &pb.GetUnpaidOrdersResponse{
 		UnpaidOrders: convertDomainOrderIntoPB(orders),
+	}, nil
+}
+
+func (a *Adapter) StoreBalance(ctx context.Context, req *pb.StoreBalanceRequest) (*pb.StoreBalanceResponse, error) {
+	if err := a.service.StoreBalance(req.GetCustomerId(), req.GetBalance()); err != nil {
+		return &pb.StoreBalanceResponse{
+			Message: err.Error(),
+		}, err
+	}
+
+	return &pb.StoreBalanceResponse{
+		Message: "successfully stored balance",
 	}, nil
 }
 

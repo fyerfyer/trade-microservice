@@ -9,4 +9,5 @@ type CustomerPort interface {
 	ReactiveCustomer(id uint64) error
 	SubmitOrder(customerID uint64, items []domain.OrderItem) (bool, error)
 	GetUnpaidOrders(customerID uint64) ([]domain.Order, error)
+	StoreBalance(customerID uint64, balance float32) error
 }

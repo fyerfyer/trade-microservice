@@ -20,11 +20,7 @@ func NewService(repo Repository, paymentPort ports.PaymentPort) *Service {
 }
 
 func (s *Service) ProcessOrder(customerID uint64, items []domain.OrderItem) error {
-	order := &domain.Order{
-		CustomerID: customerID,
-		Items:      items,
-		Status:     "unprocessed",
-	}
+	order := domain.NewOrder(customerID, items)
 
 	err := s.repo.Save(order)
 	if err != nil {
@@ -37,7 +33,8 @@ func (s *Service) ProcessOrder(customerID uint64, items []domain.OrderItem) erro
 
 	// successfully paid
 	if err == nil && res.Status == "success" {
-		s.repo.Delete(order.ID)
+		order.Status = "success"
+		s.repo.Update(order)
 		return nil
 	}
 

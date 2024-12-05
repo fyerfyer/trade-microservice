@@ -11,6 +11,7 @@ service Customer {
     rpc GetUnpaidOrders(GetUnpaidOrdersRequest) returns (GetUnpaidOrdersResponse);
     rpc DeactivateCustomer(DeactivateCustomerRequest) returns (DeactivateCustomerResponse);
     rpc ActivateCustomer(ActivateCustomerRequest) returns (ActivateCustomerResponse);
+    rpc StoreBalance(StoreBalanceRequest) returns (StoreBalanceResponse);
 }
 
 message CustomerEntity {
@@ -83,4 +84,11 @@ message GetUnpaidOrdersResponse {
     repeated Order unpaid_orders = 1;
 }
 
+message StoreBalanceRequest {
+    uint64 customer_id = 1;
+    float balance = 2;
+}
 
+message StoreBalanceResponse {
+    string message = 1;
+}
