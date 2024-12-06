@@ -8,6 +8,7 @@ service Customer {
     rpc CreateCustomer(CreateCustomerRequest) returns (CreateCustomerResponse);
     rpc GetCustomer(GetCustomerRequest) returns (GetCustomerResponse);
     rpc SubmitOrder(SubmitOrderRequest) returns (SubmitOrderResponse);
+    rpc PayOrder(PayOrderRequest) returns (PayOrderResponse);
     rpc GetUnpaidOrders(GetUnpaidOrdersRequest) returns (GetUnpaidOrdersResponse);
     rpc DeactivateCustomer(DeactivateCustomerRequest) returns (DeactivateCustomerResponse);
     rpc ActivateCustomer(ActivateCustomerRequest) returns (ActivateCustomerResponse);
@@ -60,6 +61,16 @@ message SubmitOrderRequest {
 }
 
 message SubmitOrderResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message PayOrderRequest {
+    uint64 customer_id = 1;
+    uint64 order_id = 2;
+}
+
+message PayOrderResponse {
     bool success = 1;
     string message = 2;
 }

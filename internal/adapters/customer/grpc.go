@@ -2,7 +2,6 @@ package customer
 
 import (
 	"context"
-
 	"trade-microservice.fyerfyer.net/internal/application/domain"
 	pb "trade-microservice.fyerfyer.net/proto/customer"
 )
@@ -61,6 +60,21 @@ func (a *Adapter) SubmitOrder(ctx context.Context, req *pb.SubmitOrderRequest) (
 	}
 
 	return &pb.SubmitOrderResponse{
+		Success: success,
+		Message: "items processed successfully",
+	}, nil
+}
+
+func (a *Adapter) PayOrder(ctx context.Context, req *pb.PayOrderRequest) (*pb.PayOrderResponse, error) {
+	success, err := a.service.PayOrder(req.GetCustomerId(), req.GetOrderId())
+	if err != nil {
+		return &pb.PayOrderResponse{
+			Success: success,
+			Message: err.Error(),
+		}, err
+	}
+
+	return &pb.PayOrderResponse{
 		Success: success,
 		Message: "order processed successfully",
 	}, nil

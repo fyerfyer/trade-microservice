@@ -49,7 +49,7 @@ func main() {
 
 	// setup service
 	paymentService := paymentService.NewService(paymentRepo, redisClient)
-	orderService := orderService.NewService(orderRepo, paymentService)
+	orderService := orderService.NewService(orderRepo, redisClient, paymentService)
 	customerService := customerService.NewService(customerRepo, redisClient, orderService)
 
 	// setup adapter

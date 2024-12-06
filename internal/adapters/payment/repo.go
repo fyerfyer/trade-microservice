@@ -7,8 +7,8 @@ import (
 )
 
 type Payment struct {
-	CustomerID uint64  `gorm:"primaryKey;not null;index"`
-	OrderID    uint64  `gorm:"not null;index"`
+	CustomerID uint64  `gorm:"not null;index"`
+	OrderID    uint64  `gorm:"primaryKey;not null;index"`
 	TotalPrice float32 `gorm:"not null"`
 	Status     string  `gorm:"type:varchar(50);not null"`
 }

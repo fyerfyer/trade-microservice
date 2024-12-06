@@ -11,10 +11,9 @@ type Order struct {
 }
 
 type OrderItem struct {
-	ProductCode string    `json:"product_code"`
-	UnitPrice   float32   `json:"unit_price"`
-	Quantity    int32     `json:"quantity"`
-	CreatedAt   time.Time `json:"created_at"`
+	ProductCode string  `json:"product_code"`
+	UnitPrice   float32 `json:"unit_price"`
+	Quantity    int32   `json:"quantity"`
 }
 
 func NewOrder(customerID uint64, orderItems []OrderItem) *Order {

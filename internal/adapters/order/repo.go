@@ -94,9 +94,9 @@ func ConvertDomainOrdersIntoDB(orders []domain.Order) []Order {
 }
 
 func ConvertDBIntoDomainOrder(order Order) domain.Order {
-	var orderItems []domain.OrderItem
+	var items []domain.OrderItem
 	for _, orderItem := range order.OrderItems {
-		orderItems = append(orderItems, domain.OrderItem{
+		items = append(items, domain.OrderItem{
 			ProductCode: orderItem.ProductCode,
 			UnitPrice:   orderItem.UnitPrice,
 			Quantity:    orderItem.Quantity,
@@ -104,9 +104,11 @@ func ConvertDBIntoDomainOrder(order Order) domain.Order {
 	}
 
 	return domain.Order{
+		ID:         uint64(order.ID),
 		CustomerID: order.CustomerID,
+		Items:      items,
 		Status:     order.Status,
-		Items:      orderItems,
+		CreatedAt:  order.CreatedAt,
 	}
 }
 

@@ -19,6 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
+	Order_ProcessItems_FullMethodName = "/order.Order/ProcessItems"
 	Order_ProcessOrder_FullMethodName = "/order.Order/ProcessOrder"
 )
 
@@ -26,6 +27,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type OrderClient interface {
+	ProcessItems(ctx context.Context, in *ProcessItemsRequest, opts ...grpc.CallOption) (*ProcessItemsResponse, error)
 	ProcessOrder(ctx context.Context, in *ProcessOrderRequest, opts ...grpc.CallOption) (*ProcessOrderResponse, error)
 }
 
@@ -35,6 +37,15 @@ type orderClient struct {
 
 func NewOrderClient(cc grpc.ClientConnInterface) OrderClient {
 	return &orderClient{cc}
+}
+
+func (c *orderClient) ProcessItems(ctx context.Context, in *ProcessItemsRequest, opts ...grpc.CallOption) (*ProcessItemsResponse, error) {
+	out := new(ProcessItemsResponse)
+	err := c.cc.Invoke(ctx, Order_ProcessItems_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *orderClient) ProcessOrder(ctx context.Context, in *ProcessOrderRequest, opts ...grpc.CallOption) (*ProcessOrderResponse, error) {
@@ -50,6 +61,7 @@ func (c *orderClient) ProcessOrder(ctx context.Context, in *ProcessOrderRequest,
 // All implementations must embed UnimplementedOrderServer
 // for forward compatibility
 type OrderServer interface {
+	ProcessItems(context.Context, *ProcessItemsRequest) (*ProcessItemsResponse, error)
 	ProcessOrder(context.Context, *ProcessOrderRequest) (*ProcessOrderResponse, error)
 	mustEmbedUnimplementedOrderServer()
 }
@@ -58,6 +70,9 @@ type OrderServer interface {
 type UnimplementedOrderServer struct {
 }
 
+func (UnimplementedOrderServer) ProcessItems(context.Context, *ProcessItemsRequest) (*ProcessItemsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ProcessItems not implemented")
+}
 func (UnimplementedOrderServer) ProcessOrder(context.Context, *ProcessOrderRequest) (*ProcessOrderResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ProcessOrder not implemented")
 }
@@ -72,6 +87,24 @@ type UnsafeOrderServer interface {
 
 func RegisterOrderServer(s grpc.ServiceRegistrar, srv OrderServer) {
 	s.RegisterService(&Order_ServiceDesc, srv)
+}
+
+func _Order_ProcessItems_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ProcessItemsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrderServer).ProcessItems(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Order_ProcessItems_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrderServer).ProcessItems(ctx, req.(*ProcessItemsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Order_ProcessOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -99,6 +132,10 @@ var Order_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "order.Order",
 	HandlerType: (*OrderServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "ProcessItems",
+			Handler:    _Order_ProcessItems_Handler,
+		},
 		{
 			MethodName: "ProcessOrder",
 			Handler:    _Order_ProcessOrder_Handler,

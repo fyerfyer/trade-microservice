@@ -24,10 +24,26 @@ func NewOrderAdapter(orderServiceURL string) (*OrderAdapter, error) {
 	return &OrderAdapter{order: pb.NewOrderClient(conn)}, nil
 }
 
-func (o *OrderAdapter) ProcessOrder(customerID uint64, items []domain.OrderItem) error {
-	_, err := o.order.ProcessOrder(context.Background(), &pb.ProcessOrderRequest{
+func (o *OrderAdapter) ProcessItems(customerID uint64, items []domain.OrderItem) error {
+	_, err := o.order.ProcessItems(context.Background(), &pb.ProcessItemsRequest{
 		CustomerId: customerID,
 		OrderItems: convertDomainItemsIntoPB(items),
+	})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (o *OrderAdapter) ProcessOrder(order domain.Order) error {
+	_, err := o.order.ProcessOrder(context.Background(), &pb.ProcessOrderRequest{
+		Order: &pb.OrderEntity{
+			OrderId:    order.ID,
+			OrderItems: convertDomainItemsIntoPB(order.Items),
+			Status:     order.Status,
+		},
 	})
 
 	if err != nil {

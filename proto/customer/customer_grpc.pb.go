@@ -22,6 +22,7 @@ const (
 	Customer_CreateCustomer_FullMethodName     = "/customer.Customer/CreateCustomer"
 	Customer_GetCustomer_FullMethodName        = "/customer.Customer/GetCustomer"
 	Customer_SubmitOrder_FullMethodName        = "/customer.Customer/SubmitOrder"
+	Customer_PayOrder_FullMethodName           = "/customer.Customer/PayOrder"
 	Customer_GetUnpaidOrders_FullMethodName    = "/customer.Customer/GetUnpaidOrders"
 	Customer_DeactivateCustomer_FullMethodName = "/customer.Customer/DeactivateCustomer"
 	Customer_ActivateCustomer_FullMethodName   = "/customer.Customer/ActivateCustomer"
@@ -35,6 +36,7 @@ type CustomerClient interface {
 	CreateCustomer(ctx context.Context, in *CreateCustomerRequest, opts ...grpc.CallOption) (*CreateCustomerResponse, error)
 	GetCustomer(ctx context.Context, in *GetCustomerRequest, opts ...grpc.CallOption) (*GetCustomerResponse, error)
 	SubmitOrder(ctx context.Context, in *SubmitOrderRequest, opts ...grpc.CallOption) (*SubmitOrderResponse, error)
+	PayOrder(ctx context.Context, in *PayOrderRequest, opts ...grpc.CallOption) (*PayOrderResponse, error)
 	GetUnpaidOrders(ctx context.Context, in *GetUnpaidOrdersRequest, opts ...grpc.CallOption) (*GetUnpaidOrdersResponse, error)
 	DeactivateCustomer(ctx context.Context, in *DeactivateCustomerRequest, opts ...grpc.CallOption) (*DeactivateCustomerResponse, error)
 	ActivateCustomer(ctx context.Context, in *ActivateCustomerRequest, opts ...grpc.CallOption) (*ActivateCustomerResponse, error)
@@ -70,6 +72,15 @@ func (c *customerClient) GetCustomer(ctx context.Context, in *GetCustomerRequest
 func (c *customerClient) SubmitOrder(ctx context.Context, in *SubmitOrderRequest, opts ...grpc.CallOption) (*SubmitOrderResponse, error) {
 	out := new(SubmitOrderResponse)
 	err := c.cc.Invoke(ctx, Customer_SubmitOrder_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *customerClient) PayOrder(ctx context.Context, in *PayOrderRequest, opts ...grpc.CallOption) (*PayOrderResponse, error) {
+	out := new(PayOrderResponse)
+	err := c.cc.Invoke(ctx, Customer_PayOrder_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -119,6 +130,7 @@ type CustomerServer interface {
 	CreateCustomer(context.Context, *CreateCustomerRequest) (*CreateCustomerResponse, error)
 	GetCustomer(context.Context, *GetCustomerRequest) (*GetCustomerResponse, error)
 	SubmitOrder(context.Context, *SubmitOrderRequest) (*SubmitOrderResponse, error)
+	PayOrder(context.Context, *PayOrderRequest) (*PayOrderResponse, error)
 	GetUnpaidOrders(context.Context, *GetUnpaidOrdersRequest) (*GetUnpaidOrdersResponse, error)
 	DeactivateCustomer(context.Context, *DeactivateCustomerRequest) (*DeactivateCustomerResponse, error)
 	ActivateCustomer(context.Context, *ActivateCustomerRequest) (*ActivateCustomerResponse, error)
@@ -138,6 +150,9 @@ func (UnimplementedCustomerServer) GetCustomer(context.Context, *GetCustomerRequ
 }
 func (UnimplementedCustomerServer) SubmitOrder(context.Context, *SubmitOrderRequest) (*SubmitOrderResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SubmitOrder not implemented")
+}
+func (UnimplementedCustomerServer) PayOrder(context.Context, *PayOrderRequest) (*PayOrderResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PayOrder not implemented")
 }
 func (UnimplementedCustomerServer) GetUnpaidOrders(context.Context, *GetUnpaidOrdersRequest) (*GetUnpaidOrdersResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUnpaidOrders not implemented")
@@ -214,6 +229,24 @@ func _Customer_SubmitOrder_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CustomerServer).SubmitOrder(ctx, req.(*SubmitOrderRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Customer_PayOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PayOrderRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CustomerServer).PayOrder(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Customer_PayOrder_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CustomerServer).PayOrder(ctx, req.(*PayOrderRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -308,6 +341,10 @@ var Customer_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SubmitOrder",
 			Handler:    _Customer_SubmitOrder_Handler,
+		},
+		{
+			MethodName: "PayOrder",
+			Handler:    _Customer_PayOrder_Handler,
 		},
 		{
 			MethodName: "GetUnpaidOrders",

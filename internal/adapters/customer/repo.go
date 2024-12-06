@@ -61,13 +61,24 @@ func (r *GormRepository) GetByName(customerName string) (*domain.Customer, error
 
 func (r *GormRepository) GetUnpaidOrdersByID(customerID uint64) ([]domain.Order, error) {
 	var orders []order.Order
-	err := r.db.Where("id = ?", customerID).Find(&orders).Error
+	err := r.db.Preload("OrderItems").Where("status = ? and customer_id = ?", "unpaid", customerID).Find(&orders).Error
 	if err != nil {
 		return nil, err
 	}
 
 	domainOrders := order.ConvertDBIntoDomainOrders(orders)
 	return domainOrders, nil
+}
+
+func (r *GormRepository) GetOrderByID(customerID, orderID uint64) (*domain.Order, error) {
+	var o order.Order
+	err := r.db.Preload("OrderItems").Where("customer_id = ? and id = ?", customerID, orderID).First(&o).Error
+	if err != nil {
+		return nil, err
+	}
+
+	domainOrder := order.ConvertDBIntoDomainOrder(o)
+	return &domainOrder, nil
 }
 
 func ConvertDomainCustomerIntoDB(customer domain.Customer) Customer {

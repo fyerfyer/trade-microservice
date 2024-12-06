@@ -10,4 +10,5 @@ type Repository interface {
 	GetByID(customerID uint64) (*domain.Customer, error)
 	GetByName(customerName string) (*domain.Customer, error)
 	GetUnpaidOrdersByID(customerID uint64) ([]domain.Order, error)
+	GetOrderByID(customerID, orderID uint64) (*domain.Order, error)
 }
