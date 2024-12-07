@@ -2,10 +2,16 @@ package order
 
 import (
 	"context"
+	"log"
+	"time"
 
+	grpc_retry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
+	"github.com/sony/gobreaker"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/codes"
 	"trade-microservice.fyerfyer.net/internal/application/domain"
+	"trade-microservice.fyerfyer.net/internal/grpc_config"
+	"trade-microservice.fyerfyer.net/internal/tls"
 	pb "trade-microservice.fyerfyer.net/proto/order"
 )
 
@@ -13,9 +19,39 @@ type OrderAdapter struct {
 	order pb.OrderClient
 }
 
+var cb *gobreaker.CircuitBreaker
+
+func initCircuitBreaker() {
+	cb = gobreaker.NewCircuitBreaker(gobreaker.Settings{
+		Name:        "orderServiceCircuitBreaker",
+		MaxRequests: 3,
+		Timeout:     time.Second * 4,
+		ReadyToTrip: func(counts gobreaker.Counts) bool {
+			failureRatio := float64(counts.TotalFailures) / float64(counts.Requests)
+			return failureRatio >= 0.6
+		},
+		OnStateChange: func(name string, from gobreaker.State, to gobreaker.State) {
+			log.Printf("cb %s change from status %v to %v", name, from, to)
+		},
+	})
+}
+
 func NewOrderAdapter(orderServiceURL string) (*OrderAdapter, error) {
-	conn, err := grpc.Dial(orderServiceURL,
-		grpc.WithTransportCredentials(insecure.NewCredentials()))
+	// tls config
+	tlsCredentials, err := tls.GetClientTLSCredentials()
+	if err != nil {
+		return err
+	}
+
+	// config reset strategy
+	opts := grpc_config.ResetModel(codes.Internal,
+		5, grpc_retry.BackoffLinear(time.Second))
+
+	// append cb
+	initCircuitBreaker()
+	opts = append(opts, grpc.WithUnaryInterceptor(grpc_config.CBClientInterceptor(cb)))
+	opts = append(opts, grpc.WithTransportCredentials(tlsCredentials))
+	conn, err := grpc.Dial(orderServiceURL, opts...)
 
 	if err != nil {
 		return nil, err

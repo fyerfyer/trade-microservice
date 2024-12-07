@@ -16,4 +16,5 @@ var (
 	FAILED_TO_STORE_CACHE_ERROR  = status.New(codes.Internal, "failed to store into cache").Err()
 	FAILED_TO_UPDATE_DB_ERROR    = status.New(codes.Internal, "failed to update database").Err()
 	FAILED_TO_UPDATE_CACHE_ERROR = status.New(codes.Internal, "failed to update cache").Err()
+	FAILED_TLS_CERT              = status.New(codes.Internal, "failed to append CA certs").Err()
 )

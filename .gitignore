@@ -1,1 +1,11 @@
 go.sum
+
+# certificate and key file
+*.pem
+*.key
+*.crt
+*.csr
+*.srl
+
+# temp file
+extfile.cnf
