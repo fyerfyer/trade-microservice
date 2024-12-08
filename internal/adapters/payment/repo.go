@@ -1,6 +1,7 @@
 package payment
 
 import (
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"trade-microservice.fyerfyer.net/internal/adapters/customer"
 	"trade-microservice.fyerfyer.net/internal/application/domain"
@@ -17,10 +18,18 @@ type GormRepository struct {
 	db *gorm.DB
 }
 
-func NewGormRepository(db *gorm.DB) *GormRepository {
-	return &GormRepository{db: db}
-}
+func NewGormRepository(dsn string) (*GormRepository, error) {
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		return nil, err
+	}
 
+	if err := db.AutoMigrate(&Payment{}); err != nil {
+		return nil, err
+	}
+
+	return &GormRepository{db: db}, nil
+}
 func (r *GormRepository) GetCustomerByID(customerID uint64) (*domain.Customer, error) {
 	var c customer.Customer
 	if err := r.db.Model(&customer.Customer{}).Where("id = ?", customerID).First(&c, customerID).Error; err != nil {

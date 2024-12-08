@@ -1,6 +1,7 @@
 package customer
 
 import (
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"trade-microservice.fyerfyer.net/internal/adapters/order"
 	"trade-microservice.fyerfyer.net/internal/application/domain"
@@ -18,8 +19,16 @@ type GormRepository struct {
 	db *gorm.DB
 }
 
-func NewGormRepository(db *gorm.DB) *GormRepository {
-	return &GormRepository{db: db}
+func NewGormRepository(dsn string) (*GormRepository, error) {
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		return nil, err
+	}
+
+	if err := db.AutoMigrate(&Customer{}); err != nil {
+		return nil, err
+	}
+	return &GormRepository{db: db}, nil
 }
 
 func (r *GormRepository) Save(customer *domain.Customer) error {

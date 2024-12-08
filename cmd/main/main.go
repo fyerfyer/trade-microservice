@@ -4,8 +4,6 @@ import (
 	"log"
 	"time"
 
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
 	customerAdapter "trade-microservice.fyerfyer.net/internal/adapters/customer"
 	orderAdapter "trade-microservice.fyerfyer.net/internal/adapters/order"
 	paymentAdapter "trade-microservice.fyerfyer.net/internal/adapters/payment"
@@ -17,31 +15,26 @@ import (
 
 func main() {
 	dsn := "root:110119abc@tcp(127.0.0.1:3306)/microservice?charset=utf8&parseTime=true"
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		log.Fatalf("failed to connect to database:%v", err)
-	}
-
-	// model migration
-	err = db.AutoMigrate(&customerAdapter.Customer{})
-	if err != nil {
-		log.Fatalf("failed to migrate customers: %v", err)
-	}
-
-	err = db.AutoMigrate(&orderAdapter.Order{}, &orderAdapter.OrderItem{})
-	if err != nil {
-		log.Fatalf("failed to migrate orders: %v", err)
-	}
-
-	err = db.AutoMigrate(&paymentAdapter.Payment{})
-	if err != nil {
-		log.Fatalf("failed to migrate payments: %v", err)
-	}
 
 	// setup repo
-	orderRepo := orderAdapter.NewGormRepository(db)
-	paymentRepo := paymentAdapter.NewGormRepository(db)
-	customerRepo := customerAdapter.NewGormRepository(db)
+	var (
+		customerRepo *customerAdapter.GormRepository
+		orderRepo    *orderAdapter.GormRepository
+		paymentRepo  *paymentAdapter.GormRepository
+		err          error
+	)
+
+	if customerRepo, err = customerAdapter.NewGormRepository(dsn); err != nil {
+		log.Fatalf("failed to init customer database: %v", err)
+	}
+
+	if orderRepo, err = orderAdapter.NewGormRepository(dsn); err != nil {
+		log.Fatalf("failed to init order database: %v", err)
+	}
+
+	if paymentRepo, err = paymentAdapter.NewGormRepository(dsn); err != nil {
+		log.Fatalf("failed to init payment database: %v", err)
+	}
 
 	// setup cache
 	redisClient := redis.NewRedisClient("127.0.0.1:6379", "", 10, 10, 3*time.Minute)

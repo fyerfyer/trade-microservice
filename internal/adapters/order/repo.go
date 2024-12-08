@@ -1,6 +1,9 @@
 package order
 
 import (
+	"fmt"
+
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"trade-microservice.fyerfyer.net/internal/application/domain"
 )
@@ -23,8 +26,24 @@ type GormRepository struct {
 	db *gorm.DB
 }
 
-func NewGormRepository(db *gorm.DB) *GormRepository {
-	return &GormRepository{db: db}
+func NewGormRepository(dsn string) (*GormRepository, error) {
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		// return nil, err
+		return nil, fmt.Errorf("failed to connect to database: %w", err)
+	}
+
+	if err := db.AutoMigrate(&Order{}); err != nil {
+		// return nil, err
+		return nil, fmt.Errorf("failed to connect to database: %w", err)
+	}
+
+	if err := db.AutoMigrate(&OrderItem{}); err != nil {
+		// return nil, err
+		return nil, fmt.Errorf("failed to connect to database: %w", err)
+	}
+
+	return &GormRepository{db: db}, nil
 }
 
 func (r *GormRepository) Save(order *domain.Order) error {

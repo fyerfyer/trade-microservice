@@ -40,7 +40,7 @@ func NewOrderAdapter(orderServiceURL string) (*OrderAdapter, error) {
 	// tls config
 	tlsCredentials, err := tls.GetClientTLSCredentials()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// config reset strategy
